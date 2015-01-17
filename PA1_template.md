@@ -1,18 +1,24 @@
----
-title: "Assignment 1 - Reproducible research"
-output:
-  html_document:
-    keep_md: yes
-date: "Friday, January 16, 2015"
----
+# Assignment 1 - Reproducible research
+Friday, January 16, 2015  
 
 ### Loading and preprocessing the data   
 
-```{r}
+
+```r
 ### Load relevant libraries
 
   library(data.table)
   library(sqldf)
+```
+
+```
+## Loading required package: gsubfn
+## Loading required package: proto
+## Loading required package: RSQLite
+## Loading required package: DBI
+```
+
+```r
   library(ggplot2)
   library(scales)
   library(date)
@@ -27,16 +33,12 @@ date: "Friday, January 16, 2015"
 
 ### Transfer contents of variable to ca that has only non NA values
   ca <- na.omit(ac)
-
-
-
-
 ```
 
 ### mean total number of steps taken per day
 
-```{r, echo=TRUE}
 
+```r
 ### Calculate sum for each day
   sumstepsdaily <- aggregate(ca$step,list(ca$date),sum)
 
@@ -52,9 +54,12 @@ date: "Friday, January 16, 2015"
 	hist1plot
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
 ### Average daily pattern
 
-```{r, echo=TRUE}
+
+```r
 ###Mean and median
 
 
@@ -65,15 +70,38 @@ date: "Friday, January 16, 2015"
 	mean<- aggregate(ca$step,list(ca$date),FUN=mean,na.action=na.pass, na.rm=TRUE)
 	colnames(mean) <- c("date","mean")
 	head(mean)
+```
+
+```
+##         date     mean
+## 1 2012-10-02  0.43750
+## 2 2012-10-03 39.41667
+## 3 2012-10-04 42.06944
+## 4 2012-10-05 46.15972
+## 5 2012-10-06 53.54167
+## 6 2012-10-07 38.24653
+```
+
+```r
 	median<- aggregate(ca$step,list(ca$date),median)
 	colnames(median) <- c("date","median")
 	head(median)
 ```
+
+```
+##         date median
+## 1 2012-10-02      0
+## 2 2012-10-03      0
+## 3 2012-10-04      0
+## 4 2012-10-05      0
+## 5 2012-10-06      0
+## 6 2012-10-07      0
+```
  The values above highlight the mean and median values over differnt days
  
 ### Time Series Plot
-```{r, echo=TRUE}
 
+```r
 ###Draw time series plot. First pull values to t, and then plot t
 
   t<- aggregate(ca$step,list(ca$interval),FUN=mean)
@@ -83,12 +111,14 @@ date: "Friday, January 16, 2015"
 	plot(t$Group.1, t$x, xlab = "5-minute interval", ylab = "average number of steps taken", type = "l")
 	title("timeseries plot")
 	axis(side = 1, at = labels.at, labels = labels)
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
 As shown in plot above, The duration between 08:35 AM and 08:40 AM witnesses maximum number of steps
 
 ### Part 2 - input missing values
-```{r,echo=TRUE}
+
+```r
 ###PART 2
 
 ### Calculate number of blank rows
@@ -96,10 +126,15 @@ As shown in plot above, The duration between 08:35 AM and 08:40 AM witnesses max
 	NROW(new_ac)
 ```
 
+```
+## [1] 2304
+```
+
 The above value lists the number of missing rows in original dataset
 
 ### New histogram with no missing values
-```{r,echo=TRUE}
+
+```r
 ### Calculate mean and then use it to replace all NAs
 	meanvac <- mean(ac$steps,na.rm=TRUE)
 	ac$steps[is.na(ac$steps)] <- meanvac
@@ -110,7 +145,13 @@ The above value lists the number of missing rows in original dataset
 ### Calculate number of blank rows
   new_ac <- subset(ac, is.na(ac$steps))
 	NROW(new_ac)
+```
 
+```
+## [1] 0
+```
+
+```r
 ### Calculate mean and then use it to replace all NAs
 	meanvac <- mean(ac$steps,na.rm=TRUE)
 	ac$steps[is.na(ac$steps)] <- meanvac
@@ -125,11 +166,14 @@ The above value lists the number of missing rows in original dataset
 	hist2plot
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
+
  If we compare this with the earlier histogram, we see that the blank values have now been replaced with mean, leading to higher sums
  
  The following plot illustrates the difference more clearly
  
-```{r,echo=TRUE}
+
+```r
   sumstepsdaily$z <- 'withna'
 	sumstepsdaily1$z <- 'withoutna'
 	comb <- rbind(sumstepsdaily, sumstepsdaily1)
@@ -137,22 +181,49 @@ The above value lists the number of missing rows in original dataset
 	ggplot(comb, aes(x, fill = z)) + geom_density(alpha = 0.2)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png) 
+
 ### The new mean and median values
 
-```{r,echo=TRUE}
+
+```r
 ###Mean and median
 
   acmean<- aggregate(ac$step,list(ac$date),FUN=mean,na.action=na.pass, na.rm=TRUE)
 	head(acmean)
+```
+
+```
+##      Group.1        x
+## 1 2012-10-01 37.38260
+## 2 2012-10-02  0.43750
+## 3 2012-10-03 39.41667
+## 4 2012-10-04 42.06944
+## 5 2012-10-05 46.15972
+## 6 2012-10-06 53.54167
+```
+
+```r
 	acmedian<- aggregate(ac$step,list(ac$date),median)
 	head(acmedian)
+```
+
+```
+##      Group.1       x
+## 1 2012-10-01 37.3826
+## 2 2012-10-02  0.0000
+## 3 2012-10-03  0.0000
+## 4 2012-10-04  0.0000
+## 5 2012-10-05  0.0000
+## 6 2012-10-06  0.0000
 ```
 
 Comparing with earlier values we see different medians
 
 ### Comparing weekdays and weekends
 
-```{r,echo=TRUE}
+
+```r
 ### Get day type and change to weekday, or weekend; 
   ac$daytype <- weekdays(as.Date(ac$date))
 	ac$daytype[ac$daytype == "Monday"]<-"Weekday"
@@ -183,5 +254,7 @@ Comparing with earlier values we see different medians
 	title("Weekday plot")
 	axis(side = 1, at = labels.at, labels = labels)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
 
 We can clearly see weekday activites having single max at around 8:35 AM, while weekend activities have multiple maximum values
